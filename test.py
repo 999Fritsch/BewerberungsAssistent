@@ -23,6 +23,7 @@ def generate_interview_questions(skills, N):
         f"You are an AI assistant that generates {N} short and concise technical questions based on a given skill set. "
         f"For each skill provided, generate relevant and challenging technical questions that have only one correct answer. "
         f"Provide exactly {N} questions. Provide only the questions, not the answers. return them in a json format like this: "
+        "{'questions': ['question1', 'question2', 'question3', 'question4', 'question5']}"
     )
     messages = [
         ("system", system_prompt),
