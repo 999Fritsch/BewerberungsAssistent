@@ -1,5 +1,8 @@
 import sqlite3
 import csv
+import requests
+from bs4 import BeautifulSoup
+import json
 
 def generate_csv_from_select(statement, outputfile):
 
@@ -83,5 +86,59 @@ def import_csv_to_position(csv_file_name, db_name):
         if conn:
             conn.close()
 
+# Funktion zum Abrufen und Extrahieren von Text aus einer Webseite
+def get_page_text(url, output_filename):
+    try:
+        # Sendet eine GET-Anfrage an die URL
+        response = requests.get(url)
+
+        # Überprüfen, ob die Anfrage erfolgreich war (Statuscode 200)
+        if response.status_code == 200:
+            # Die Seite mit BeautifulSoup parsen
+            soup = BeautifulSoup(response.text, 'html.parser')
+
+            # Den gesamten Text aus der Seite extrahieren (nur den sichtbaren Text)
+            page_text = soup.get_text()
+            page_text = extract_subtext(page_text, "Ihr Profil:", "Wir bieten:")
+            page_text = page_text.replace("\n"," ")
+
+
+            # Speichern des extrahierten Textes in eine JSON-Datei
+            data = {'url': url, 'text': page_text.strip()}
+
+            # JSON-Daten in eine Datei schreiben
+            with open(output_filename, 'w', encoding='utf-8') as json_file:
+                json.dump(data, json_file, ensure_ascii=False, indent=4)
+
+            print(f"Der Text von der Seite wurde erfolgreich in '{output_filename}' gespeichert.")
+        else:
+            print(f"Fehler: Die Anfrage an {url} war nicht erfolgreich (Statuscode: {response.status_code}).")
+
+    except requests.exceptions.RequestException as e:
+        print(f"Fehler bei der Anfrage: {e}")
+    except Exception as e:
+        print(f"Allgemeiner Fehler: {e}")
+
+def extract_subtext(text, start_marker, end_marker):
+    # Finde die Position des Startmarkes
+    start_pos = text.find(start_marker)
+    if start_pos == -1:
+        return "Startmarker nicht gefunden"
+    
+    # Finde die Position des Endmarkes
+    end_pos = text.find(end_marker, start_pos)
+    if end_pos == -1:
+        return "Endmarker nicht gefunden"
+    
+    # Extrahiere den Subtext zwischen dem Start- und Endmarker
+    # Addiere die Länge des Startmarkers, um direkt nach ihm zu beginnen
+    subtext = text[start_pos + len(start_marker):end_pos].strip()
+    
+    return subtext
+
+url = "https://www.bwi.de/karriere/stellenangebote/job/senior-it-architekt-netzwerk-security-m-w-d-58392"
+output_filename = "page_text.json"  # Name der JSON-Datei, in die der Text gespeichert wird
+
+get_page_text(url, output_filename)
 
 #import_csv_to_position("job_csv_test.csv","./data/assessment.db")
