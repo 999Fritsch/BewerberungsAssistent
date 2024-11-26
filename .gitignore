@@ -1,0 +1,41 @@
+# Ignore Python bytecode files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ignore virtual environment directories
+venv/
+ENV/
+env/
+.venv/
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore logs and temporary files
+*.log
+*.tmp
+*.swp
+
+# Ignore compiled files
+*.o
+*.so
+*.out
+
+# Ignore package directories
+node_modules/
+dist/
+build/
+
+# Ignore Huggingface cache
+.cache/huggingface/
+
+# Ignore CSV files
+*.csv
+
+# Ignore test output files
+test_port.txt
