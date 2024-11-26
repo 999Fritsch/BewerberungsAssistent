@@ -136,8 +136,8 @@ def extract_subtext(text, start_marker, end_marker):
     
     return subtext
 
-url = "https://www.bwi.de/karriere/stellenangebote/job/senior-it-architekt-netzwerk-security-m-w-d-58392"
-output_filename = "page_text.json"  # Name der JSON-Datei, in die der Text gespeichert wird
+url = "https://www.bwi.de/karriere/stellenangebote/job/lead-solution-architekt-german-mission-network-m-w-d-58389"
+output_filename = "Profiltext.json"  # Name der JSON-Datei, in die der Text gespeichert wird
 
 get_page_text(url, output_filename)
 
