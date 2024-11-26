@@ -42,3 +42,4 @@ test_port.txt
 
 # Ignore model files
 Phi-3.5-mini-instruct-IQ4_XS.gguf
+Mistral-Nemo-Instruct-2407-IQ4_XS.gguf
