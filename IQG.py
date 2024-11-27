@@ -4,6 +4,13 @@ from langchain_core.pydantic_v1 import BaseModel, Field
 from time import time
 
 class InterviewQuestionGenerator:
+    """A class to generate technical interview questions based on a given skill using a language model.
+        structured_llm (object): An instance of a language model with structured output.
+    Methods:
+        __init__(modelpath: str) -> None:
+            Initializes the InterviewQuestionGenerator class with a given model path.
+        initalize_model(modelpath: str) -> None:
+        generate_interview_questions(skill: str, N: int) -> list:"""
     
     class InterviewQuestion(BaseModel):
         """
@@ -15,6 +22,15 @@ class InterviewQuestionGenerator:
         question: str = Field(description="An interview question")
         
     def __init__(self, modelpath:str) -> None:
+        """
+        Initializes the IQG class with a given model path.
+
+        Args:
+            modelpath (str): The file path to the model to be initialized.
+
+        Sets:
+            system_prompt (str): A prompt string for generating technical questions.
+        """
         self.system_prompt = (
             f"You are an AI assistant that generates a short and concise technical question based on a given skill. "
             f"For each skill provided, generate relevant and challenging technical question that have only one correct answer. "
@@ -23,6 +39,15 @@ class InterviewQuestionGenerator:
         self.initalize_model(modelpath)
 
     def initalize_model(self, modelpath:str) -> None:
+        """
+        Initializes the language model with the specified parameters.
+
+        Args:
+            modelpath (str): The path to the model file.
+
+        Returns:
+            None
+        """
         llm = ChatLlamaCpp(
             temperature=0.5,
             model_path=modelpath,
