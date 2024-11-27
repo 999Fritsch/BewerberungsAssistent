@@ -12,12 +12,12 @@ class InterviewQuestion(BaseModel):
     """
     question: str = Field(description="An interview question")
 
-def generate_interview_questions(skills, N, structured_llm):
+def generate_interview_questions(skill, N, structured_llm):
     """
-    Generates a list of technical interview questions based on a given skill set.
+    Generates a list of technical interview questions based on a given skill.
 
     Args:
-        skills (list of str): A list of skills for which to generate questions.
+        skill (str): A skill for which to generate questions.
         N (int): The number of questions to generate.
         structured_llm (object): An instance of a language model with an `invoke` method to generate questions.
 
@@ -25,23 +25,22 @@ def generate_interview_questions(skills, N, structured_llm):
         list of str: A list of generated interview questions.
 
     Example:
-        skills = ["Python", "Machine Learning"]
+        skill = "Python"
         N = 5
         structured_llm = SomeLanguageModel()
-        questions = generate_interview_questions(skills, N, structured_llm)
+        questions = generate_interview_questions(skill, N, structured_llm)
     """
-    skills_str = ', '.join(skills)
     system_prompt = (
-        f"You are an AI assistant that generates short and concise technical questions based on a given skill set. "
-        f"For each skill provided, generate relevant and challenging technical questions that have only one correct answer. "
-        f"Provide only the questions, not the answers."
+        f"You are an AI assistant that generates a short and concise technical question based on a given skill. "
+        f"For each skill provided, generate relevant and challenging technical question that have only one correct answer. "
+        f"Provide only the question, not the answer."
     )
     messages = [
         ("system", system_prompt),
-        ("human", f"Skill set: {skills_str}"),
+        ("human", f"Skill: {skill}"),
     ]
     questions = []
-    for i in range(N):
+    for _ in range(N):
         question = structured_llm.invoke(messages)
         questions.append(question)
     return questions
@@ -56,7 +55,7 @@ if __name__ == "__main__":
         model_path=local_model,
         n_ctx=10000,
         #n_gpu_layers=0,
-        n_batch=8,  # Adjust based on your system resources
+        n_batch=512,  # Adjust based on your system resources
         max_tokens=512,
         n_threads=multiprocessing.cpu_count() - 1,
         repeat_penalty=1.5,
@@ -78,9 +77,10 @@ if __name__ == "__main__":
         "Strategic Product Development, Experte",
         "German Language Proficiency, Experte"
     ]
+    skill = skills[0]
     N = 5
     start_time = time()
-    questions = generate_interview_questions(skills, N, structured_llm)
+    questions = generate_interview_questions(skill, N, structured_llm)
     end_time = time()
     print(f"Time taken: {end_time - start_time} seconds")
     print(questions)
