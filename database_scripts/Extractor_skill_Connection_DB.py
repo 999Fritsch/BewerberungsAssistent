@@ -45,10 +45,10 @@ def get_job_offer_text(url):
     return job_title_text, job_profile
 
 # URL fur den Crawler
-job_offer_url = "https://www.bwi.de/karriere/stellenangebote/job/senior-it-systemingenieur-military-it-services-m-w-d-58317"
+#job_offer_url = "https://www.bwi.de/karriere/stellenangebote/job/senior-it-systemingenieur-military-it-services-m-w-d-58317"
 
 # Jobprfil Inhalt von der URL
-job_title, job_profile_text = get_job_offer_text(job_offer_url)
+#job_title, job_profile_text = get_job_offer_text(job_offer_url)
 
 def clean_text(text):
     
@@ -81,11 +81,11 @@ def extract_skills(job_profile_text):
 
 
 # Skills extrahieren
-extracted_skills = extract_skills(job_profile_text)
+#extracted_skills = extract_skills(job_profile_text)
 
 # Ausgabe der extrahierten Skills
-print("Extrahierte Skills:", extracted_skills)
-print ("Der Job-Titel ist:", job_title)
+#print("Extrahierte Skills:", extracted_skills)
+#print ("Der Job-Titel ist:", job_title)
 
 
 # Funktion für die Erstellung einer DB
@@ -117,9 +117,9 @@ def insert_skills_into_db(job_title, skills):
 
 # Erstelle DB falls fehlend
 
-create_database ()
+#create_database ()
 
 # Pflege Daten in die Skill-DB
-insert_skills_into_db(job_title, extracted_skills)
+#insert_skills_into_db(job_title, extracted_skills)
 
 
