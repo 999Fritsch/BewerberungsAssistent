@@ -1,5 +1,4 @@
 import sqlite3
-import helper_functions
 
 connection = sqlite3.connect("./data/assessment.db")
 connection.execute("PRAGMA foreign_keys = 1")
