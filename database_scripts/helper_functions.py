@@ -136,6 +136,36 @@ def extract_subtext(text, start_marker, end_marker):
     
     return subtext
 
+def save_skills_to_db(job_name, file_path, db_path='data/assessment.db'):
+    # Schritt 1: Verbindung zur SQLite-Datenbank herstellen
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+
+    # Schritt 3: Datei zeilenweise lesen und Skills in die Datenbank einfügen
+    with open(file_path, 'r', encoding='utf-8') as file:
+        skillset = []
+        for line in file:
+            # Entferne Leerzeichen und Zeilenumbrüche
+            skill = line.strip()
+            if skill:  # Nur nicht-leere Zeilen hinzufügen
+                skillset.append(skill)
+                cursor.execute('''
+                    INSERT OR IGNORE INTO skill (name) VALUES (?)
+                ''', (skill,))
+                cursor.execute('''
+                    SELECT id FROM skill WHERE name = (?)
+                ''', (skill,))
+                id = cursor.fetchone()
+                cursor.execute('''
+                    INSERT INTO skillset (id, skill) VALUES (?,?)
+                ''', (skill,id))
+        
+
+    # Schritt 4: Änderungen speichern und Verbindung schließen
+    conn.commit()
+    conn.close()
+
 url = "https://www.bwi.de/karriere/stellenangebote/job/lead-solution-architekt-german-mission-network-m-w-d-58389"
 output_filename = "Profiltext.json"  # Name der JSON-Datei, in die der Text gespeichert wird
 
