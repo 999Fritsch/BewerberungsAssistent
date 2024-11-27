@@ -1,0 +1,13 @@
+[theme]
+primaryColor="#ff003a"
+backgroundColor="#404040"
+secondaryBackgroundColor="#7c7c7c"
+textColor="#f2f2f2"
+font="sans serif"    
+
+[client]
+toolbarMode = "viewer"
+showSidebarNavigation = true
+
+[runner]
+magicEnabled = false
