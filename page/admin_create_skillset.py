@@ -23,6 +23,25 @@ def url_Form():
 
 # Skill grading form
 def skillGrading_Foram(skill_list):
+
+    # scrape career portal
+    # create skill list
+    
+
+    conn = sqlite3.connect("./data/assessment.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT skill.name 
+        FROM skill
+        JOIN skillset ON skill.id = skillset.skill
+        JOIN position ON position.skillset = skillset.id
+        WHERE position.id = ?
+    """, (job_id,))
+    skill_list = cursor.fetchall()
+
+    if skill_list:
+        skillGrading_Foram(skill_list)
     #Variables
     graded_Skills = []
     
@@ -98,28 +117,9 @@ def questionFinalizing_Form(question_list):
 # connection = sqlite3.connect(".data/assessment.db")
 # cursor = connection.cursor()
 
-
-# get URL from user
 url = url_Form()
-# scrape career portal
-# create skill list
+
 job_id = pf.extract_skills(url)
-
-conn = sqlite3.connect("./data/assessment.db")
-cursor = conn.cursor()
-
-cursor.execute("""
-    SELECT skill.name 
-    FROM skill
-    JOIN skillset ON skill.id = skillset.skill
-    JOIN position ON position.skillset = skillset.id
-    WHERE position.id = ?
-""", (job_id,))
-skill_list = cursor.fetchall()
-
-if skill_list:
-    skillGrading_Foram(skill_list)
-
 # pass graded skills to db
 # get_Questions for skillset
 
