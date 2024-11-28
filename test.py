@@ -20,11 +20,9 @@ def get_all_skills(cursor):
     cursor.execute("SELECT id, name FROM skill")
     return cursor.fetchall()
 
-def main():
+def generate_and_insert_questions(position_id, N):
     connection = sqlite3.connect("./data/assessment.db")
     cursor = connection.cursor()
-
-    position_id = 1  # Replace with the desired position ID
 
     position = get_position(cursor, position_id)
     skillset = get_skillset(cursor, position_id)
@@ -48,7 +46,7 @@ def main():
         next_questionset_id = 1
     for skill in skills:
         skill_id, skill_name = skill
-        questions = iqg.generate_interview_questions(skill_name, 1)
+        questions = iqg.generate_interview_questions(skill_name, N)
         question_text = questions[0].question
 
         # Insert the question into the database
@@ -70,4 +68,5 @@ def main():
     connection.close()
 
 if __name__ == "__main__":
-    main()
+    generate_and_insert_questions(1, 1)
+    generate_and_insert_questions(6, 1)
