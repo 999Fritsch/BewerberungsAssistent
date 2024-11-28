@@ -27,7 +27,6 @@ except Exception as e:
 # define Admin Navigation
 adm_pages = {
     "Dashboards": [
-        st.set_page_config(page_title="Skillset Dashboard", page_icon=":guardsman:", layout="wide"),
         st.Page("page/admin_dashboard.py", title="Home"),
         st.Page("page/admin_position_dashboard.py", title="Stellen"),
         st.Page("page/admin_skillset_dashboard.py", title="Skillsets"),
