@@ -77,6 +77,30 @@ def extract_skills(url):
 
     return inserted_id
 
+def get_skills_by_position_id(position_id):
+    """
+    Retrieve a list of skills associated with a given position ID from the database.
+    Args:
+        position_id (int): The ID of the position for which to retrieve skills.
+    Returns:
+        list of tuple: A list of tuples, each containing the name of a skill associated with the given position ID.
+    """
+    conn = sqlite3.connect("./data/assessment.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT skill.name 
+        FROM skill
+        JOIN skillset ON skill.id = skillset.skill
+        JOIN position ON position.skillset = skillset.id
+        WHERE position.id = ?
+    """, (position_id,))
+    
+    skill_list = cursor.fetchall()
+    conn.close()
+    
+    return skill_list
+
 #extract_skills("https://www.bwi.de/karriere/stellenangebote/job/senior-it-systemingenieur-military-it-services-m-w-d-58317")
 #extract_skills("https://www.bwi.de/karriere/stellenangebote/job/senior-it-architekt-ddi-dns-dhcp-und-ip-adressmanagement-m-w-d-58398")
     
