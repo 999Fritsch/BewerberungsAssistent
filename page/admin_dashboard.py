@@ -17,7 +17,7 @@ def get_applicant_data(position_filter=None, score_min=None, score_max=None):
     JOIN question q ON qs.question = q.id
     JOIN answer an ON q.id = an.question
     JOIN application a ON an.application = a.id
-    WHERE p.id = 1
+    WHERE p.id = p.id
     """
     
 
@@ -25,12 +25,12 @@ def get_applicant_data(position_filter=None, score_min=None, score_max=None):
     if position_filter:
         query += " AND p.name = ?"
         filters.append(position_filter)
-    if score_min is not None:
-        query += " AND a.score >= ?"
-        filters.append(score_min)
-    if score_max is not None:
-        query += " AND a.score <= ?"
-        filters.append(score_max)
+    #if score_min is not None:
+    #    query += " AND a.score >= ?"
+    #    filters.append(score_min)
+    #if score_max is not None:
+    #    query += " AND a.score <= ?"
+    #    filters.append(score_max)
     
     cursor.execute(query, tuple(filters))
     results = cursor.fetchall()
