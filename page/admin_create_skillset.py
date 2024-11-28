@@ -7,10 +7,10 @@ from database_scripts import process_functions as pf
 st.title("Skillset Extractor")
 
 # Default URL
-default_url = "https://www.bwi.de/karriere/stellenangebote/job/senior-it-systemingenieur-military-it-services-m-w-d-58317"
+#default_url = "https://www.bwi.de/karriere/stellenangebote/job/senior-it-systemingenieur-military-it-services-m-w-d-58317"
 
 # Input field for the URL with a default value
-url = st.text_input("Enter the URL:", value=default_url)
+url = st.text_input("Enter the URL:")
 
 # Check if the URL and ID tuple is already in session state
 if 'url_id_tuple' not in st.session_state:
