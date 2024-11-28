@@ -65,7 +65,7 @@ def get_answers(applicant_id):
     WHERE ap.id = ?
     """
     
-    cursor.execute(query, (applicant_id,))
+    cursor.execute(query, (int(applicant_id),))
     results = cursor.fetchall()
     conn.close()
 
