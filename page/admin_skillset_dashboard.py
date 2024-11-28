@@ -1,6 +1,10 @@
 import streamlit as st
 import sqlite3
 import pandas as pd
+import plotly.express as px
+
+# Dieser Befehl muss der erste Streamlit-Befehl im Skript sein
+
 
 # Funktion, um Skillsets aus der Datenbank zu holen
 def get_skillsets():
@@ -38,24 +42,66 @@ def display_skillsets():
 
     # Wenn es Skillsets gibt, zeige sie in einem DataFrame an
     if not df_skillsets.empty:
-        st.write("### Übersicht der Skillsets")
-        st.dataframe(df_skillsets)  # Zeigt die Tabelle in Streamlit an
+        st.markdown("### Übersicht der Skillsets", unsafe_allow_html=True)
+        
+        # Hier kannst du die Daten ansprechender darstellen, z.B. mit Plotly oder als eine interaktive Tabelle
+        fig = px.bar(df_skillsets, x="Skillset ID", y="Skillset Grade", color="Skill Name",
+                     labels={"Skillset ID": "Skillset ID", "Skillset Grade": "Skillset Grade"},
+                     title="Skillset Übersicht")
+        st.plotly_chart(fig, use_container_width=True)  # Darstellung mit Plotly
+        
+        st.write("#### Skillsets im Detail")
+        st.dataframe(df_skillsets)  # Streamlit bietet eine interaktive Darstellung als Tabelle an
         
         # Optional: Filter hinzufügen
         st.write("### Filter")
         skillset_filter = st.selectbox("Wählen Sie ein Skillset aus", df_skillsets["Skillset ID"].unique())
         
         filtered_df = df_skillsets[df_skillsets["Skillset ID"] == skillset_filter]
-        st.write(f"### Skills im Skillset {skillset_filter}")
+        st.write(f"#### Skills im Skillset {skillset_filter}")
         st.dataframe(filtered_df)
     else:
         st.warning("Es wurden keine Skillsets gefunden.")
 
 # Streamlit App: Hauptlogik
 def main():
-    st.title("Skillset Dashboard")
+    # Benutze Markdown und Streamlit-Widgets, um das Design zu verbessern
+    st.markdown(
+        """
+        <style>
+        .stApp {
+            background-color: #f0f4f8;
+        }
+        .stButton button {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+        .stButton button:hover {
+            background-color: #45a049;
+        }
+        .stMarkdown {
+            font-family: 'Roboto', sans-serif;
+        }
+        .stTitle {
+            color: #2C3E50;
+            font-weight: bold;
+        }
+        </style>
+        """, unsafe_allow_html=True)
 
-    # Zeige nur Skillsets an
+    st.title("Skillset Dashboard :bar_chart:")
+    
+    # Anzeige eines Hero Banners oder einer Willkommensnachricht
+    st.markdown(
+        """
+        <div style="background-color:#4CAF50;padding:10px;color:white;font-size:20px;border-radius:10px;">
+        Willkommen beim Skillset Dashboard! Hier können Sie alle Skillsets und zugehörigen Skills einsehen.
+        </div>
+        """, unsafe_allow_html=True)
+
+    # Zeige Skillsets an
     display_skillsets()
 
 main()
