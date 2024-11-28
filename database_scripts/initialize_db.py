@@ -16,7 +16,7 @@ cursor.execute("CREATE TABLE IF NOT EXISTS answer (id INTEGER PRIMARY KEY AUTOIN
 
 cursor.execute("CREATE TABLE IF NOT EXISTS application (id INTEGER PRIMARY KEY AUTOINCREMENT, applicant, score)")
 
-cursor.execute("CREATE TABLE IF NOT EXISTS skillset (id INTEGER PRIMARY KEY, skill, grade, FOREIGN KEY (skill) REFERENCES skill (id))")
+cursor.execute("CREATE TABLE IF NOT EXISTS skillset (id , skill , grade, PRIMARY KEY (id, skill), FOREIGN KEY (skill) REFERENCES skill (id))")
 
 cursor.execute("CREATE TABLE IF NOT EXISTS position (id INTEGER PRIMARY KEY AUTOINCREMENT, name, description TEXT, skillset, questionset, FOREIGN KEY (skillset) REFERENCES skillset (id), FOREIGN KEY (questionset) REFERENCES questionset (id))")
 

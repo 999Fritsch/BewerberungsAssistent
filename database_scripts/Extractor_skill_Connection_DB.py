@@ -29,7 +29,7 @@ def get_job_offer_text(url):
     
     # Crawle nach Jobtitel
 
-    job_title = soup.find("div", class_="h1")
+    job_title = soup.find("div", class_="jobTitle")
     if job_title:
         job_title_text = job_title.get_text(strip=True)
     else:
@@ -54,11 +54,7 @@ def clean_text(text):
     
     return text
 # Liste von bekannten Skills (DB community)
-skills_list = [
-    "Active Directory", "Firewall", "Storage", "Backup", "Windows Server 2016", 
-    "Netzwerk Topologie", "Powershell", "C#", "Automatisierung", "Scriptsprachen", "Programmiersprachen",
-    "Python", "Java", "JavaScript", "AWS", "Azure", "Linux", "Django", "Flask"
-]
+
 
 # Funktion zur Extraktion von Skills
 def extract_skills(job_profile_text):
@@ -69,9 +65,12 @@ def extract_skills(job_profile_text):
     found_skills = []
 
     # Durchsuche den bereinigten Text nach Skills
-
+    skills_list = [
+    "Active Directory", "Firewall", "Storage", "Backup", "Windows Server 2016", 
+    "Netzwerk Topologie", "Powershell", "C#", "Automatisierung", "Scriptsprachen", "Programmiersprachen",
+    "Python", "Java", "JavaScript", "AWS", "Azure", "Linux", "Django", "Flask"
+    ]
     for skill in skills_list:
-
         # Anpassung der Expression zum Filtern auf Keywörter innerhalb Klammern
         pattern = r'[\(\[]?' + re.escape(skill) + r'[\)\]]?'
         if re.search(pattern, cleaned_skilltext, re.IGNORECASE):
