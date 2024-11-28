@@ -3,6 +3,18 @@ from database_scripts import Extractor_skill_Connection_DB as ext
 
 
 def create_position(name):
+    """
+    Fügt eine neue Position in die SQLite-Datenbank ein, falls der Name noch nicht existiert.
+
+    Args:
+        name (str): Der Name der Position, die hinzugefügt werden soll.
+
+    Raises:
+        sqlite3.Error: Wenn ein Fehler bei der Verbindung zur Datenbank oder bei der Ausführung der SQL-Befehle auftritt.
+
+    Example:
+        create_position("Software Engineer")
+    """
     # Verbindung zur SQLite-Datenbank herstellen (oder erstellen, falls sie nicht existiert)
     conn = sqlite3.connect("./data/assessment.db")
     cursor = conn.cursor()
@@ -22,6 +34,16 @@ def create_position(name):
     conn.close()
 
 def extract_skills(url):
+    """
+    Extracts skills from a job offer URL and stores them in an SQLite database.
+    This function connects to an SQLite database, extracts job title and skills from the given URL,
+    and inserts the skills into the database. It also associates the skills with a skillset and 
+    inserts the job position with the associated skillset.
+    Args:
+        url (str): The URL of the job offer.
+    Returns:
+        int: The ID of the inserted job position, or None if the insertion failed.
+    """
     # Verbindung zur SQLite-Datenbank herstellen (oder erstellen, falls sie nicht existiert)
     conn = sqlite3.connect("./data/assessment.db")
     cursor = conn.cursor()    
