@@ -48,9 +48,13 @@ def extract_skills(url):
         cursor.execute("INSERT INTO skillset (id,skill) VALUES (?,?)", (next_skillset_id,skill_id))
         conn.commit()
     
-    cursor.execute("INSERT INTO position (name,skillset) VALUES (?,?)", (job_title,next_skillset_id))
+    cursor.execute("INSERT INTO position (name,skillset) VALUES (?,?)" "RETURNING id", (job_title,next_skillset_id))
+    row = cursor.fetchone()
+    (inserted_id, ) = row if row else None
     conn.commit()
 
-extract_skills("https://www.bwi.de/karriere/stellenangebote/job/senior-it-systemingenieur-military-it-services-m-w-d-58317")
+    return inserted_id
+
+#extract_skills("https://www.bwi.de/karriere/stellenangebote/job/senior-it-systemingenieur-military-it-services-m-w-d-58317")
 #extract_skills("https://www.bwi.de/karriere/stellenangebote/job/senior-it-architekt-ddi-dns-dhcp-und-ip-adressmanagement-m-w-d-58398")
     

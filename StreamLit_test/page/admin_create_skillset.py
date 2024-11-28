@@ -2,6 +2,7 @@
 import streamlit as st 
 import sqlite3
 import uuid
+from database_scripts import process_functions as pf
 
 
 ############################
@@ -102,7 +103,19 @@ def questionFinalizing_Form(question_list):
 url = url_Form()
 # scrape career portal
 # create skill list
-skill_list = []
+job_id = pf.extract_skills(url)
+
+conn = sqlite3.connect("./data/assessment.db")
+cursor = conn.cursor()
+
+cursor.execute("""
+    SELECT skill.name 
+    FROM skill
+    JOIN skillset ON skill.id = skillset.skill
+    JOIN position ON position.skillset = skillset.id
+    WHERE position.id = ?
+""", (job_id,))
+skill_list = cursor.fetchall()
 
 if skill_list:
     skillGrading_Foram(skill_list)
