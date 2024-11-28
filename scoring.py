@@ -96,27 +96,29 @@ if __name__ == "__main__":
     connection = sqlite3.connect("data/assessment.db")
     cursor = connection.cursor()
 
-    position_id = 1
+    # Fetch all answers and their corresponding questions
     cursor.execute("""
-        SELECT q.description AS question_description, a.description AS answer_description
-        FROM position p
-        JOIN questionset qs ON p.questionset = qs.id
-        JOIN question q ON qs.question = q.id
-        LEFT JOIN answer a ON q.id = a.question
-        WHERE p.id = ?
-    """, (position_id,))
+        SELECT a.id AS answer_id, q.description AS question_description, a.description AS answer_description
+        FROM answer a
+        JOIN question q ON a.question = q.id
+    """)
 
     qa = cursor.fetchall()
     print(qa)
 
-    overall_list = []
-    for question, answer in qa:
-        # Example usage
-        #question = "What is polymorphism in OOP?"
-        #answer = "Polymorphism is the ability of an object to take on many forms."
+    for answer_id, question, answer in qa:
         result = scorer.score_answer(question, answer)
-        overall_list.append(int(result.score))
-        print(result.score)
+        score = int(result.score)
+        print(score)
         print(result.reasoning)
 
-    end_result =sum(overall_list) / len(overall_list)
+        # Update the score in the answer table
+        cursor.execute("""
+            UPDATE answer
+            SET score = ?
+            WHERE id = ?
+        """, (score, answer_id))
+
+    # Commit the changes to the database
+    connection.commit()
+    connection.close()
