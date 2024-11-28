@@ -59,7 +59,7 @@ class InterviewQuestionGenerator:
             repeat_penalty=1.5,
             top_p=0.5,
             verbose=False,
-            seed=42
+            seed=-1
         )
         self.structured_llm = llm.with_structured_output(self.InterviewQuestion)
 
