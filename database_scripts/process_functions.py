@@ -29,21 +29,28 @@ def extract_skills(url):
     job_title, job_profile_text = Extractor_skill_Connection_DB.get_job_offer_text(url)
     skills = Extractor_skill_Connection_DB.extract_skills(job_profile_text)
 
-    cursor.execute("SELECT max(id) FROM skillset")
+    print(skills)
 
-    if cursor.fetchone()[0] is not None:
-        next_skillset_id = cursor.fetchone()[0] + 1
+    cursor.execute("SELECT max(id) FROM skillset")
+    current_skillset_id = cursor.fetchone()[0]
+    if current_skillset_id is not None:
+        next_skillset_id = current_skillset_id + 1
     else:
-        next_skillset_id = 0
+        next_skillset_id = 1
+
+    
 
     for skill in skills:
         cursor.execute("INSERT OR IGNORE INTO skill (name) VALUES (?)", (skill,))
+        conn.commit()
         cursor.execute("SELECT id FROM skill WHERE name = ?", (skill,))
         skill_id = cursor.fetchone()[0]
         cursor.execute("INSERT INTO skillset (id,skill) VALUES (?,?)", (next_skillset_id,skill_id))
+        conn.commit()
     
     cursor.execute("INSERT INTO position (name,skillset) VALUES (?,?)", (job_title,next_skillset_id))
-    cursor.commit()
+    conn.commit()
 
-extract_skills("https://www.bwi.de/karriere/stellenangebote/job/senior-it-architekt-netzwerk-security-m-w-d-58392")
+extract_skills("https://www.bwi.de/karriere/stellenangebote/job/senior-it-systemingenieur-military-it-services-m-w-d-58317")
+#extract_skills("https://www.bwi.de/karriere/stellenangebote/job/senior-it-architekt-ddi-dns-dhcp-und-ip-adressmanagement-m-w-d-58398")
     
