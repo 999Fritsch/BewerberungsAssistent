@@ -12,8 +12,15 @@ default_url = "https://www.bwi.de/karriere/stellenangebote/job/senior-it-systemi
 # Input field for the URL with a default value
 url = st.text_input("Enter the URL:", value=default_url)
 
-# Extract the position ID from the URL
-ID = pf.extract_skills(url)
+# Check if the URL and ID tuple is already in session state
+if 'url_id_tuple' not in st.session_state:
+    # Extract the position ID from the URL
+    ID = pf.extract_skills(url)
+    # Save the URL and ID tuple in session state
+    st.session_state.url_id_tuple = (url, ID)
+else:
+    # Retrieve the ID from session state
+    ID = st.session_state.url_id_tuple[1]
 
 # Button to trigger skill extraction
 if st.button("Extract Skills") or pf.check_position_id_exists(ID):
@@ -36,17 +43,6 @@ if st.button("Extract Skills") or pf.check_position_id_exists(ID):
             st.session_state.skill_grades[skill_name] = st.segmented_control(f"Select grade for {skill_name}:", grading_options, key=skill_name, default=st.session_state.skill_grades[skill_name])
         
         # Button to save the graded skills into the database
-        if st.button("Save Skills"):
-            conn = sqlite3.connect("./data/assessment.db")
-            cursor = conn.cursor()
-            
-            for skill_name, grade in st.session_state.skill_grades.items():
-                cursor.execute("SELECT id FROM skill WHERE name = ?", (skill_name,))
-                skill_id = cursor.fetchone()[0]
-                cursor.execute("INSERT OR REPLACE INTO skillset (id, skill, grade) VALUES (?, ?, ?)", (ID, skill_id, grade))
-            
-            conn.commit()
-            conn.close()
-            st.success("Skills and grades have been saved to the database.")
+        st.button("Save Skills", on_click=lambda: pf.update_skillset(ID, st.session_state.skill_grades))
     else:
         st.write("Please enter a valid URL.")

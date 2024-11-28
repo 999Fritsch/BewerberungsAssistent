@@ -101,6 +101,43 @@ def get_skills_by_position_id(position_id):
     
     return skill_list
 
+def check_position_id_exists(position_id):
+    """
+    Checks if a position with the given ID exists in the database.
+    Args:
+        position_id (int): The ID of the position to check.
+    Returns:
+        bool: True if the position exists, False otherwise.
+    """
+    conn = sqlite3.connect("./data/assessment.db")
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT 1 FROM position WHERE id = ?", (position_id,))
+    exists = cursor.fetchone() is not None
+    
+    conn.close()
+    return exists
+
+def update_skillset(ID, skill_grades_sessionstate):
+    """
+    Updates the skillset for a given ID with the provided skill grades.
+    Args:
+        ID (int): The identifier for the entity whose skillset is being updated.
+        skill_grades_sessionstate (dict): A dictionary where keys are skill names and values are the corresponding grades.
+    Returns:
+        None
+    """
+    conn = sqlite3.connect("./data/assessment.db")
+    cursor = conn.cursor()
+    
+    for skill_name, grade in skill_grades_sessionstate.items():
+        cursor.execute("SELECT id FROM skill WHERE name = ?", (skill_name,))
+        skill_id = cursor.fetchone()[0]
+        cursor.execute("INSERT OR REPLACE INTO skillset (id, skill, grade) VALUES (?, ?, ?)", (ID, skill_id, grade))
+    
+    conn.commit()
+    conn.close()
+
 #extract_skills("https://www.bwi.de/karriere/stellenangebote/job/senior-it-systemingenieur-military-it-services-m-w-d-58317")
 #extract_skills("https://www.bwi.de/karriere/stellenangebote/job/senior-it-architekt-ddi-dns-dhcp-und-ip-adressmanagement-m-w-d-58398")
     
