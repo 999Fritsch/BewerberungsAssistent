@@ -1,137 +1,52 @@
-# Imports
-import streamlit as st 
+import streamlit as st
 import sqlite3
 import uuid
 from database_scripts import process_functions as pf
 
+# Title of the app
+st.title("Skillset Extractor")
 
-############################
-# Functions
-############################
-# URL input Form
-def url_Form():
-    # position url question
-    with st.form("position_url"):
-   
-        st.write("Bitte die URL der Stellenbeschreibung, für welche ein Skillset angelegt werden soll angeben")
-        url = st.text_input('url', value="", max_chars=None, placeholder='https://www.bwi.de/karriere...', label_visibility="collapsed")
-           
-        submit_button = st.form_submit_button("Weiter")  
+# Default URL
+default_url = "https://www.bwi.de/karriere/stellenangebote/job/senior-it-systemingenieur-military-it-services-m-w-d-58317"
+
+# Input field for the URL with a default value
+url = st.text_input("Enter the URL:", value=default_url)
+
+# Extract the position ID from the URL
+ID = pf.extract_skills(url)
+
+# Button to trigger skill extraction
+if st.button("Extract Skills") or pf.check_position_id_exists(ID):
+    if url:
+        # Get skills from the database using the extracted ID
+        skill_list = pf.get_skills_by_position_id(ID)
         
-    if submit_button:
-        job_id = pf.extract_skills(url)
-        st.session_state['job_id'] = job_id
-    if 'job_id' in st.session_state:
-        return st.session_state['job_id']
+        # Initialize session state for skill grades
+        if 'skill_grades' not in st.session_state:
+            st.session_state.skill_grades = {}
 
-
-# Skill grading form
-def skillGrading_Foram(ID):
-
-    # scrape career portal
-    # create skill list
-    if not ID:
-        return
-    conn = sqlite3.connect("./data/assessment.db")
-    cursor = conn.cursor()
-
-    cursor.execute("""
-        SELECT skill.name 
-        FROM skill
-        JOIN skillset ON skill.id = skillset.skill
-        JOIN position ON position.skillset = skillset.id
-        WHERE position.id = ?
-    """, (ID,))
-    skill_list = cursor.fetchall()
-
-    #Variables
-    graded_Skills = []
-    
-    # Process
-    with st.form("skill_grading"):
-    
-        # define collums
-        header = st.columns([1,2,3])
-        header[0].subheader('Auswahl')
-        header[1].subheader('Skill')
-        header[2].subheader('Wertung')
-    
-        # create dynamic form
+        # Display the extracted skills and allow user to choose grading
+        st.write("Extracted Skills:")
+        grading_options = ["Grundkentnisse", "Fortgeschritten", "Experte"]
+        
         for skill in skill_list:
-            row = st.columns([1,2,3])
-            responses = []
+            skill_name = skill[0]
+            if skill_name not in st.session_state.skill_grades:
+                st.session_state.skill_grades[skill_name] = grading_options[0]
+            st.session_state.skill_grades[skill_name] = st.selectbox(f"Select grade for {skill_name}:", grading_options, key=skill_name, index=grading_options.index(st.session_state.skill_grades[skill_name]))
         
-            select = row[0].checkbox('none', value=True, key=uuid.uuid4(), on_change=None, label_visibility="collapsed")
-            responses.append(select)
-        
-            name = row[1].text_input('none', value=skill, key=uuid.uuid4(), placeholder=skill, label_visibility="collapsed")
-            responses.append(name)
-       
-            grading = row[2].segmented_control('Grundlegend', ['Grundlegend', 'Fortgeschritten', 'Experte'], selection_mode="single", key=uuid.uuid4(), label_visibility="collapsed", default='Grundlegend')
-            responses.append(grading)
-       
-            # remove deselected skills
-            if responses[0]:
-                graded_Skills.append(responses)
+        # Button to save the graded skills into the database
+        if st.button("Save Skills"):
+            conn = sqlite3.connect("./data/assessment.db")
+            cursor = conn.cursor()
             
-        submit_button = st.form_submit_button("Abgeben")
-    if submit_button:
-        st.session_state['graded_Skills'] = graded_Skills
-    if 'graded_Skills' in st.session_state:
-        return st.session_state['graded_Skills']
-    return
-
-# Skill grading form
-def questionFinalizing_Form(question_list):
-    #Varaibles
-    selected_questions = []
-    
-    # Process
-    with st.form("question_finalizing"):
-    
-        # define collums
-        header = st.columns([1,2])
-        header[0].subheader('Auswahl')
-        header[1].subheader('Frage')
-    
-        # create dynamic form
-        for question in question_list:
-            row = st.columns([1,2])
-            responses = []
-        
-            select = row[0].checkbox('none', value=True, key=uuid.uuid4(), on_change=None, label_visibility="collapsed")
-            responses.append(select)
-        
-            description = row[1].text_input('none', value=question, key=uuid.uuid4(), placeholder="Frage", label_visibility="collapsed")
-            responses.append(description)
-               
-            # remove deselected skills
-            if responses[0]:
-                selected_questions.append(responses) 
-                     
-        st.form_submit_button("Abgeben")
-        
-    return selected_questions
-    
-############################
-# Process
-############################
-
-# DB connection
-# connection = sqlite3.connect(".data/assessment.db")
-# cursor = connection.cursor()
-
-job_id = url_Form()
-
-if job_id:
-    skills = skillGrading_Foram(job_id)
-
-    if skills:
-        # pass graded skills to db
-        # get_Questions for skillset
-
-        question_list = []
-
-        if question_list:
-            questionFinalizing_Form(question_list)
-        # pass selected questions into db, link with corresponding skillset
+            for skill_name, grade in st.session_state.skill_grades.items():
+                cursor.execute("SELECT id FROM skill WHERE name = ?", (skill_name,))
+                skill_id = cursor.fetchone()[0]
+                cursor.execute("INSERT OR REPLACE INTO skillset (id, skill, grade) VALUES (?, ?, ?)", (ID, skill_id, grade))
+            
+            conn.commit()
+            conn.close()
+            st.success("Skills and grades have been saved to the database.")
+    else:
+        st.write("Please enter a valid URL.")
