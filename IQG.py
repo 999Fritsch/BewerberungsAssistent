@@ -49,7 +49,7 @@ class InterviewQuestionGenerator:
             None
         """
         llm = ChatLlamaCpp(
-            temperature=0.5,
+            temperature=0.6,
             model_path=modelpath,
             n_ctx=10000,
             #n_gpu_layers=0,
@@ -59,7 +59,6 @@ class InterviewQuestionGenerator:
             repeat_penalty=1.5,
             top_p=0.5,
             verbose=False,
-            seed=-1
         )
         self.structured_llm = llm.with_structured_output(self.InterviewQuestion)
 
