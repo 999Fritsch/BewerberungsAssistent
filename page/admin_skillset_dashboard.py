@@ -66,30 +66,30 @@ def display_skillsets():
 # Streamlit App: Hauptlogik
 def main():
     # Benutze Markdown und Streamlit-Widgets, um das Design zu verbessern
-    st.markdown(
-        """
-        <style>
-        .stApp {
-            background-color: #f0f4f8;
-        }
-        .stButton button {
-            background-color: #4CAF50;
-            color: white;
-            font-weight: bold;
-            border-radius: 5px;
-        }
-        .stButton button:hover {
-            background-color: #45a049;
-        }
-        .stMarkdown {
-            font-family: 'Roboto', sans-serif;
-        }
-        .stTitle {
-            color: #2C3E50;
-            font-weight: bold;
-        }
-        </style>
-        """, unsafe_allow_html=True)
+    #st.markdown(
+    #    """
+    #    <style>
+    #    .stApp {
+    #        background-color: #f0f4f8;
+    #    }
+    #    .stButton button {
+    #        background-color: #4CAF50;
+    #        color: white;
+    #        font-weight: bold;
+    #        border-radius: 5px;
+    #    }
+    #    .stButton button:hover {
+    #        background-color: #45a049;
+    #    }
+    #    .stMarkdown {
+    #        font-family: 'Roboto', sans-serif;
+    #    }
+    #    .stTitle {
+    #        color: #2C3E50;
+    #        font-weight: bold;
+    #    }
+    #    </style>
+    #    """, unsafe_allow_html=True)
 
     st.title("Skillset Dashboard :bar_chart:")
     
