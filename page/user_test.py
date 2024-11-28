@@ -1,83 +1,108 @@
 # Imports
-import streamlit as st 
-import sqlite3 
+import streamlit as st
+import sqlite3
 import uuid
 
-"""
-# DB connection
-connection = sqlite3.connect(".data/assessment.db")
-cursor = connection.cursor()
+# Funktion um Fragen aus der Datenbank zu holen
+def get_questions(job_id):
+    # DB-Verbindung
+    conn = sqlite3.connect("./data/assessment.db")
+    cursor = conn.cursor()
 
-############################
-# Process
-############################
-def get_questions(applicationID):
-    questions = cursor.execute("")
+    # SQL-Abfrage, um die Fragen für die Position zu holen
+    cursor.execute("""
+        SELECT q.id, q.description
+        FROM position p
+        JOIN questionset qs ON p.questionset = qs.id
+        JOIN question q ON qs.question = q.id
+        WHERE p.id = ?
+    """, (job_id,))
     
     
-# evaluate answers
-def evaluate_answers(answers):
-    score = 0  
-    return score
+    questions = cursor.fetchall()
     
+    return questions
 
-# push score to db
-def push_answers(applicantID, ql):
-    cursor.execute("")
-    
-""" 
-  
-def check_Status(applicationID):
-    # check if answers already exist
-    answer_content = cursor.execute("")
-    
-    # return bool
-    if answer_content:
-        return True
-    else:
-        return False
-   
 
-# create Form
-def user_Test(ql):
-    rp = [] # Variable, für ausagbe der Nutzerantworten
+# Funktion um die Antworten zu speichern
+def save_answers(job_id, answers):
+    # DB-Verbindung
+    connection = sqlite3.connect("./data/assessment.db")
+    cursor = connection.cursor()
+
+    # Antworten speichern
+    for question_id, answer in answers:
+        cursor.execute("""
+            INSERT INTO answer (description, question)
+            VALUES (?, ?)
+        """, (answer, question_id))
     
-    with st.form('user_Test'):
+    connection.commit()
+
+
+# Thank-You Page
+def thank_you_page():
+    st.write ("Vielen Dank für die Beantwortung der Fragen!")
+    st.write ("Alle Antworten wurden erfolgreich gespeichert und wir melden uns schnellstmöglich bei Ihnen mit der Ergebnissen aus dem Fragenkatalog.")
     
-        for question in ql:
-            st.write(question)
-            response = st.text_area("Antwort", key=uuid.uuid4(), help=None, on_change=None, args=None, kwargs=None, placeholder=None, disabled=False, label_visibility="collapsed")
-            rp.append(response)
+    
+# Hauptseite in Streamlit
+def question_answer_page(job_id):
+    # Lade Fragen aus der Datenbank
+    questions = get_questions(job_id)
+    
+    if not questions:
+        st.write("Es wurden keine Fragen gefunden.")
+        return
+
+    
+    # Überprüfen, ob der Benutzer bereits Antworten abgegeben hat
+    if 'answered' in st.session_state and st.session_state['answered']:
+        st.session_state['show_thank_you'] = True
+        return  # Stoppe die Verarbeitung, wenn bereits geantwortet wurde
+    answers = []  # Hier speichern wir die Antworten
+    
+    
+    with st.form("question_form"):
+        # Frage durch Frage anzeigen
+        for question_id, question_text in questions:
+            response = st.text_input(f"Frage: {question_text}", key=str(question_id))
+            answers.append((question_id, response))
         
-        st.form_submit_button('Abgeben')
-        
-    return rp
+        submit_button = st.form_submit_button("Antworten absenden")
+    
 
     
-############################
-# Process
-############################
-# BewerbungsID Auslesen
-try:
-    applicationID = st.session_state["name"]
-    applicationID = usrName.split(" ")
-    applicationID = usrName[0]
-except:
-    pass
+    # Wenn der Submit-Button geklickt wurde
+    if submit_button:
+        if all(answer[1] for answer in answers):  # Prüfe, ob alle Fragen beantwortet wurden
+            # Speichere die Antworten in der Datenbank
+            save_answers(job_id, answers)
+            # Markiere, dass der Benutzer bereits geantwortet hat
+            st.session_state['answered'] = True
+            st.session_state['show_thank_you'] = True
+           # st.experimental_rerun()
+          
 
-# get question catalogue from DB
-# ql = get_questions(applicationID):
+        else:
+            st.error("Bitte beantworten Sie alle Fragen.")
 
-# check if user already completed the Test
-if False: #replace False with check_Status(applicationID)
-    st.write('Kein offener Test verfügbar')
+
+
+# Beispielhafte Anwendung
+
+def main():
+    # In einer echten Anwendung könnte der Job ID von einer vorherigen Seite kommen
+    job_id = 1
     
-else:
-    ql = ["Welcher Tag ist heute?", "Wie ist dein name?", "wie viel Uhr ist es"] # Placeholder Fragenkatalog
-    answers = user_Test(ql)
-      
-# push questions to DB 
-# push_answers(applicationID, answers) 
+    if job_id:
+        # Zeige die Frage-Antwort-Seite für die gegebene Job-ID
+        if 'show_thank_you' in st.session_state and st.session_state ['show_thank_you']:
+            thank_you_page()
+        else:                
+            question_answer_page(job_id)
 
-# run question eval
-# evaluate_answers(applicationID)     
+
+# Anwendung starten
+
+main()
