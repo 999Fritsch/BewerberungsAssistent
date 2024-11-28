@@ -84,3 +84,4 @@ yarl==1.18.0
 streamlit
 streamlit_Authenticator
 bs4
+spacy
