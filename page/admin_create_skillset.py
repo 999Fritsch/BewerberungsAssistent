@@ -14,20 +14,24 @@ def url_Form():
     with st.form("position_url"):
    
         st.write("Bitte die URL der Stellenbeschreibung, für welche ein Skillset angelegt werden soll angeben")
-        url = st.text_input('url', value="", max_chars=None, key=uuid.uuid4(), placeholder='https://www.bwi.de/karriere...', label_visibility="collapsed")
+        url = st.text_input('url', value="", max_chars=None, placeholder='https://www.bwi.de/karriere...', label_visibility="collapsed")
            
-        st.form_submit_button("Weiter")  
+        submit_button = st.form_submit_button("Weiter")  
         
-    return url
+    if submit_button:
+        job_id = pf.extract_skills(url)
+        st.session_state['job_id'] = job_id
+    if 'job_id' in st.session_state:
+        return st.session_state['job_id']
 
 
 # Skill grading form
-def skillGrading_Foram(skill_list):
+def skillGrading_Foram(ID):
 
     # scrape career portal
     # create skill list
-    
-
+    if not ID:
+        return
     conn = sqlite3.connect("./data/assessment.db")
     cursor = conn.cursor()
 
@@ -37,11 +41,9 @@ def skillGrading_Foram(skill_list):
         JOIN skillset ON skill.id = skillset.skill
         JOIN position ON position.skillset = skillset.id
         WHERE position.id = ?
-    """, (job_id,))
+    """, (ID,))
     skill_list = cursor.fetchall()
 
-    if skill_list:
-        skillGrading_Foram(skill_list)
     #Variables
     graded_Skills = []
     
@@ -65,17 +67,19 @@ def skillGrading_Foram(skill_list):
             name = row[1].text_input('none', value=skill, key=uuid.uuid4(), placeholder=skill, label_visibility="collapsed")
             responses.append(name)
        
-            grading = row[2].segmented_control('none', ['Grundlegend', 'Fortgeschritten', 'Experte'], selection_mode="single", key=uuid.uuid4(), label_visibility="collapsed")
+            grading = row[2].segmented_control('Grundlegend', ['Grundlegend', 'Fortgeschritten', 'Experte'], selection_mode="single", key=uuid.uuid4(), label_visibility="collapsed", default='Grundlegend')
             responses.append(grading)
        
             # remove deselected skills
             if responses[0]:
                 graded_Skills.append(responses)
             
-        st.form_submit_button("Abgeben")
-        
-    return graded_Skills
-
+        submit_button = st.form_submit_button("Abgeben")
+    if submit_button:
+        st.session_state['graded_Skills'] = graded_Skills
+    if 'graded_Skills' in st.session_state:
+        return st.session_state['graded_Skills']
+    return
 
 # Skill grading form
 def questionFinalizing_Form(question_list):
@@ -117,14 +121,17 @@ def questionFinalizing_Form(question_list):
 # connection = sqlite3.connect(".data/assessment.db")
 # cursor = connection.cursor()
 
-url = url_Form()
+job_id = url_Form()
 
-job_id = pf.extract_skills(url)
-# pass graded skills to db
-# get_Questions for skillset
+if job_id:
+    skills = skillGrading_Foram(job_id)
 
-question_list = []
+    if skills:
+        # pass graded skills to db
+        # get_Questions for skillset
 
-if question_list:
-    questionFinalizing_Form(question_list)
-# pass selected questions into db, link with corresponding skillset
+        question_list = []
+
+        if question_list:
+            questionFinalizing_Form(question_list)
+        # pass selected questions into db, link with corresponding skillset
