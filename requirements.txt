@@ -86,3 +86,4 @@ streamlit
 streamlit_Authenticator
 bs4
 spacy
+plotly
