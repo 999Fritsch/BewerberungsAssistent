@@ -33,7 +33,7 @@ if st.button("Extract Skills") or pf.check_position_id_exists(ID):
             skill_name = skill[0]
             if skill_name not in st.session_state.skill_grades:
                 st.session_state.skill_grades[skill_name] = grading_options[0]
-            st.session_state.skill_grades[skill_name] = st.selectbox(f"Select grade for {skill_name}:", grading_options, key=skill_name, index=grading_options.index(st.session_state.skill_grades[skill_name]))
+            st.session_state.skill_grades[skill_name] = st.segmented_control(f"Select grade for {skill_name}:", grading_options, key=skill_name, default=st.session_state.skill_grades[skill_name])
         
         # Button to save the graded skills into the database
         if st.button("Save Skills"):
