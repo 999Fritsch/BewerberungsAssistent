@@ -7,7 +7,7 @@ cursor = connection.cursor()
 
 cursor.execute("CREATE TABLE IF NOT EXISTS question (id INTEGER PRIMARY KEY AUTOINCREMENT, description, skill, grade, FOREIGN KEY (skill) REFERENCES skill (id))")
 
-cursor.execute("CREATE TABLE IF NOT EXISTS questionset (id INTEGER PRIMARY KEY, question, FOREIGN KEY (question) REFERENCES question (id))")
+cursor.execute("CREATE TABLE IF NOT EXISTS questionset (id INTEGER, question, PRIMARY KEY (id, question) FOREIGN KEY (question) REFERENCES question (id))")
 
 cursor.execute("CREATE TABLE IF NOT EXISTS skill (id INTEGER PRIMARY KEY AUTOINCREMENT, name)")
 cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS skill_idx ON skill(name)")
