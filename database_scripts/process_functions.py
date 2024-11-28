@@ -1,5 +1,5 @@
 import sqlite3
-import Extractor_skill_Connection_DB
+from database_scripts import Extractor_skill_Connection_DB as ext
 
 
 def create_position(name):
@@ -26,8 +26,8 @@ def extract_skills(url):
     conn = sqlite3.connect("./data/assessment.db")
     cursor = conn.cursor()    
 
-    job_title, job_profile_text = Extractor_skill_Connection_DB.get_job_offer_text(url)
-    skills = Extractor_skill_Connection_DB.extract_skills(job_profile_text)
+    job_title, job_profile_text = ext.get_job_offer_text(url)
+    skills = ext.extract_skills(job_profile_text)
 
     print(skills)
 
